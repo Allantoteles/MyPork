@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* MODO CLARO (Valores por defecto) */
+    --color-bg-main: #f8f7f5;
+    --color-bg-surface: #ffffff;
+    --color-text-main: #221910;
+    --color-text-dim: #6b7280;
+    --color-border: #e5e7eb;
+  }
+
+  .dark {
+    /* MODO OSCURO */
+    --color-bg-main: #221910;
+    --color-bg-surface: #2f241a;
+    --color-text-main: #ffffff;
+    --color-text-dim: #cbad90; /* text-secondary original */
+    --color-border: #453628;
+  }
+}
+
+@theme {
+  /* Mapeamos los nombres que ya usas en tu código a las variables dinámicas */
+  
+  --color-primary: #f27f0d;
+  --color-primary-hover: #d96f0a;
+  
+  /* background-dark ahora se adapta al tema (en light será claro) */
+  --color-background-dark: var(--color-bg-main);
+  
+  /* surface-dark ahora se adapta al tema */
+  --color-surface-dark: var(--color-bg-surface);
+  
+  --color-border-dark: var(--color-border);
+  --color-text-secondary: var(--color-text-dim);
+  
+  /* Sobrescribimos 'white' para que sea el texto principal dinámico si se usa en textos generales */
+  /* O mejor, creamos una utilidad semántica */
+  --color-text-main: var(--color-text-main);
+
+  --font-display: 'Lexend', sans-serif;
+}
+
+/* Utilities customizadas */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.filled {
+  font-variation-settings: 'FILL' 1;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Animaciones */
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
