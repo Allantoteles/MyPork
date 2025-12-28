@@ -43,25 +43,24 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background-dark overflow-hidden z-[100] relative">
-      <div className="relative h-64 w-full overflow-hidden rounded-b-[2rem]">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/30 to-background-dark z-10" />
-        <img src="https://picsum.photos/seed/fitness/800/600" alt="Gym" className="w-full h-full object-cover opacity-60" />
-        <div className="absolute top-0 left-0 w-full p-4 z-20">
-          <button onClick={() => router.push('/')} className="size-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-colors">
-            <span className="material-symbols-outlined">arrow_back</span>
-          </button>
-        </div>
+    <div className="flex flex-col min-h-screen bg-background-dark overflow-y-auto z-[100] relative">
+      <div className="relative h-32 w-full overflow-hidden rounded-b-[2rem] flex-shrink-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 to-background-dark z-10" />
+        <img src="https://picsum.photos/seed/fitness/800/600" alt="Gym" className="w-full h-full object-cover opacity-30" />
       </div>
 
-      <div className="flex-1 px-6 -mt-12 relative z-20 flex flex-col items-center">
-        <div className="mb-6 text-center">
-          <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-primary text-background-dark shadow-lg mb-4">
-            <span className="material-symbols-outlined text-4xl filled">fitness_center</span>
+      <div className="flex-1 px-6 -mt-16 relative z-20 flex flex-col items-center">
+        <div className="mb-4 text-center">
+          <div className="mb-2 flex justify-center">
+            <img 
+              src="/MyPorkLogoSinFondo.png" 
+              alt="MyPork Logo" 
+              className="size-24 object-contain"
+            />
           </div>
-          <h1 className="text-3xl font-bold mb-2">{isLogin ? '¡Bienvenido!' : 'Crear Cuenta'}</h1>
-          <p className="text-text-secondary">
-            {isLogin ? 'Ingresa tus datos para continuar entrenando' : 'Regístrate para comenzar tu viaje fitness'}
+          <h1 className="text-2xl font-bold mb-1">{isLogin ? '¡Bienvenido a FitnessPork!' : 'Únete a FitnessPork'}</h1>
+          <p className="text-sm text-text-secondary">
+            {isLogin ? 'Ingresa tus datos para continuar' : 'Regístrate para comenzar tu viaje'}
           </p>
         </div>
 
@@ -76,28 +75,28 @@ export default function Login() {
           </div>
         )}
 
-        <form className="w-full space-y-5" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200 ml-1">Correo electrónico</label>
+        <form className="w-full space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-200 ml-1">Correo electrónico</label>
             <div className="relative group">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary group-focus-within:text-primary transition-colors">
-                <HiMail size={20} />
+                <HiMail size={18} />
               </div>
               <input 
                 name="email"
                 type="email" 
                 required
                 placeholder="usuario@gym.com" 
-                className="w-full pl-10 pr-3 py-3.5 border border-white/10 rounded-xl bg-surface-dark text-white focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all outline-none" 
+                className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl bg-surface-dark text-white focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all outline-none" 
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200 ml-1">Contraseña</label>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-200 ml-1">Contraseña</label>
             <div className="relative group">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary group-focus-within:text-primary transition-colors">
-                <HiLockClosed size={20} />
+                <HiLockClosed size={18} />
               </div>
               <input 
                 name="password"
@@ -105,23 +104,23 @@ export default function Login() {
                 required
                 minLength={6}
                 placeholder="••••••••" 
-                className="w-full pl-10 pr-12 py-3.5 border border-white/10 rounded-xl bg-surface-dark text-white focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all outline-none" 
+                className="w-full pl-10 pr-12 py-3 border border-white/10 rounded-xl bg-surface-dark text-white focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all outline-none" 
               />
               <button 
                 type="button" 
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-primary transition-colors focus:outline-none"
               >
-                {showPassword ? <HiEyeOff size={20} /> : <HiEye size={20} />}
+                {showPassword ? <HiEyeOff size={18} /> : <HiEye size={18} />}
               </button>
             </div>
             {isLogin && (
-              <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center justify-between pt-0.5">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" defaultChecked className="rounded bg-surface-dark border-white/10 text-primary focus:ring-primary size-4" />
-                  <span className="text-xs text-text-secondary">Recordar sesión</span>
+                  <input type="checkbox" defaultChecked className="rounded bg-surface-dark border-white/10 text-primary focus:ring-primary size-3.5" />
+                  <span className="text-[10px] text-text-secondary">Recordar sesión</span>
                 </label>
-                <button type="button" className="text-sm font-medium text-primary hover:opacity-80">¿Olvidaste tu contraseña?</button>
+                <button type="button" className="text-xs font-medium text-primary hover:opacity-80">¿Olvidaste tu contraseña?</button>
               </div>
             )}
           </div>
@@ -129,31 +128,30 @@ export default function Login() {
           <button 
             type="submit" 
             disabled={isPending}
-            className="w-full py-4 bg-primary text-background-dark font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-hover active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-primary text-background-dark font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-hover active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {isPending && <span className="material-symbols-outlined animate-spin text-xl">progress_activity</span>}
+            {isPending && <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>}
             {isLogin ? 'Ingresar' : 'Registrarse'}
           </button>
         </form>
 
-        <div className="relative w-full my-8">
+        <div className="relative w-full my-6">
           <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10" /></div>
-          <div className="relative flex justify-center text-sm"><span className="px-2 bg-background-dark text-text-secondary uppercase font-bold tracking-widest text-[10px]">O continuar con</span></div>
+          <div className="relative flex justify-center text-[10px]"><span className="px-2 bg-background-dark text-text-secondary uppercase font-bold tracking-widest">O continuar con</span></div>
         </div>
 
-        {/* Botón de Google con icono oficial de react-icons */}
         <div className="w-full">
           <button 
             onClick={handleGoogleLogin}
             type="button"
-            className="w-full flex items-center justify-center gap-3 py-3.5 border border-white/10 rounded-xl bg-surface-dark hover:bg-white/5 transition-colors active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-3 py-3 border border-white/10 rounded-xl bg-surface-dark hover:bg-white/5 transition-colors active:scale-[0.98]"
           >
-            <FcGoogle size={24} />
-            <span className="text-sm font-bold text-white">Continuar con Google</span>
+            <FcGoogle size={20} />
+            <span className="text-sm font-bold text-white">Google</span>
           </button>
         </div>
 
-        <p className="mt-8 text-sm text-text-secondary pb-8">
+        <p className="mt-6 text-sm text-text-secondary pb-6">
           {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'} 
           <button 
             onClick={() => { setIsLogin(!isLogin); setErrorMessage(null); setSuccessMessage(null); }} 
