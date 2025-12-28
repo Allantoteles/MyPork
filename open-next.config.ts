@@ -23,9 +23,6 @@ const config: OpenNextConfig = {
       queue: "direct",
     },
   },
-  dangerous: {
-    unstable_allowInsecureEmptyIncrementalCache: true,
-  },
 };
 
 export default config;
