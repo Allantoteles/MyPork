@@ -13,6 +13,7 @@ export type Ejercicio = {
   grupo_muscular: string | null;
   equipamiento: string | null;
   icono: string | null;
+  foto_url: string | null;
   creado_at: string;
 };
 

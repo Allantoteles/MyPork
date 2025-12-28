@@ -52,7 +52,7 @@ export function IOSDatePicker({ label, onChange, initialDate }: IOSDatePickerPro
     }
   }, [isOpen]);
 
-  const scrollToItem = (ref: React.RefObject<HTMLDivElement>, value: number | string) => {
+  const scrollToItem = (ref: React.RefObject<HTMLDivElement | null>, value: number | string) => {
     if (ref.current) {
       const selectedEl = ref.current.querySelector(`[data-value="${value}"]`) as HTMLElement
       if (selectedEl) {
