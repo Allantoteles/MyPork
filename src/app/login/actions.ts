@@ -5,6 +5,13 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { headers } from 'next/headers'
 
+const getBaseUrl = async () => {
+  const origin = (await headers()).get('origin')
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL
+  // Prefer explicit site URL from env; fallback to request origin; last resort localhost
+  return (envUrl && envUrl.replace(/\/$/, '')) || origin || 'http://localhost:3000'
+}
+
 export async function login(formData: FormData) {
   const supabase = await createClient()
 
@@ -33,7 +40,7 @@ export async function login(formData: FormData) {
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
-  const origin = (await headers()).get('origin')
+  const baseUrl = await getBaseUrl()
 
   const email = formData.get('email') as string
   const password = formData.get('password') as string
@@ -46,7 +53,7 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${baseUrl}/auth/callback`,
     },
   })
 
@@ -59,12 +66,12 @@ export async function signup(formData: FormData) {
 
 export async function signInWithGoogle() {
   const supabase = await createClient()
-  const origin = (await headers()).get('origin')
+  const baseUrl = await getBaseUrl()
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: `${baseUrl}/auth/callback`,
     },
   })
 
