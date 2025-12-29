@@ -8,7 +8,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -35,6 +35,12 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/auth')
   const isOnboardingRoute = request.nextUrl.pathname.startsWith('/onboarding')
+  const isCallbackRoute = request.nextUrl.pathname === '/auth/callback'
+
+  // Permitir callback sin redirecciones para que OAuth funcione
+  if (isCallbackRoute) {
+    return supabaseResponse
+  }
 
   // 1. Si no hay usuario y trata de entrar a la app, al login
   if (!user && !isAuthRoute) {

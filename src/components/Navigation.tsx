@@ -92,8 +92,14 @@ const Navigation: React.FC = () => {
       )}
 
       {/* --- BARRA DE NAVEGACIÓN --- */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-surface-dark/90 backdrop-blur-lg border-t border-border-dark px-6 py-2 pb-6 z-50 transition-colors duration-300">
-        <div className="flex items-center justify-between max-w-md mx-auto">
+      <nav 
+        className="fixed bottom-0 left-0 right-0 bg-surface-dark/90 backdrop-blur-lg border-t border-border-dark px-6 py-2 pb-6 z-50 transition-colors duration-300"
+        suppressHydrationWarning={true}
+      >
+        <div 
+          className="flex items-center justify-between max-w-md mx-auto"
+          suppressHydrationWarning={true}
+        >
           <button 
             onClick={() => router.push('/')}
             className={`flex flex-col items-center gap-1 p-2 transition-colors ${isActive('/') ? 'text-primary' : 'text-text-secondary hover:text-primary/70'}`}
@@ -110,7 +116,10 @@ const Navigation: React.FC = () => {
             <span className="text-[10px] font-medium">Biblioteca</span>
           </button>
 
-          <div className="relative -top-5">
+          <div 
+            className="relative -top-5"
+            suppressHydrationWarning={true}
+          >
             <button 
               onClick={() => setShowMenu(true)} // AHORA ABRE EL MENÚ
               className={`flex items-center justify-center size-14 rounded-full text-[#221910] shadow-[0_4px_12px_rgba(242,127,13,0.4)] hover:scale-105 transition-transform ${showMenu ? 'bg-white rotate-45' : 'bg-primary'}`}

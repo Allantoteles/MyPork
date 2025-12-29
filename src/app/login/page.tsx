@@ -39,7 +39,13 @@ export default function Login() {
   };
 
   const handleGoogleLogin = async () => {
-     await signInWithGoogle();
+    try {
+      setErrorMessage(null);
+      await signInWithGoogle();
+    } catch (error) {
+      setErrorMessage('Error al conectar con Google. Intenta de nuevo.');
+      console.error('Google login error:', error);
+    }
   };
 
   return (
@@ -55,7 +61,7 @@ export default function Login() {
             <img 
               src="/MyPorkLogoSinFondo.png" 
               alt="MyPork Logo" 
-              className="size-24 object-contain"
+              className="size-40 object-contain"
             />
           </div>
           <h1 className="text-2xl font-bold mb-1">{isLogin ? '¡Bienvenido a FitnessPork!' : 'Únete a FitnessPork'}</h1>

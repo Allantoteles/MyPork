@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { PreferencesProvider } from "@/context/PreferencesContext";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -13,16 +15,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
 };
-
-export const metadata: Metadata = {
-  title: "MyPork",
-  description: "Titan Gym Tracker clone",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "MyPork",
-  },
-};
+// ... metadata ...
 
 export default function RootLayout({
   children,
@@ -42,15 +35,18 @@ export default function RootLayout({
         className="bg-background-dark text-text-main font-display antialiased pb-24 transition-colors duration-300"
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Navigation />
-        </ThemeProvider>
+        <PreferencesProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Navigation />
+            <ServiceWorkerRegister />
+          </ThemeProvider>
+        </PreferencesProvider>
       </body>
     </html>
   );

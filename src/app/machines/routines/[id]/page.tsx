@@ -6,10 +6,13 @@ import { createClient } from '@/utils/supabase/client';
 import { Ejercicio } from '@/types/db';
 import { updateWeeklyPlan, deleteRoutine } from './actions';
 import { ConfirmModal } from '@/components/ConfirmModal';
+import { usePreferences } from '@/hooks/usePreferences';
 
 export default function EditRoutine({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { isImperial, toDisplayWeight, toKg, loading: prefsLoading } = usePreferences();
+  const [mounted, setMounted] = useState(false);
   
   const [selectedDay, setSelectedDay] = useState('L');
   const [isPending, startTransition] = useTransition();
@@ -28,6 +31,12 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
   const days = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || prefsLoading) return;
+
     const fetchData = async () => {
       const supabase = createClient();
       
@@ -51,13 +60,19 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
         
         routineExercises.forEach(item => {
           const dia = item.dia || 'L';
+          const sets = Array.isArray(item.plan_sets) 
+            ? item.plan_sets.map((s: any) => ({
+                ...s,
+                weight: toDisplayWeight(parseFloat(s.weight) || 0)
+              }))
+            : [{ reps: 10, weight: 0 }];
+
           newWeeklyPlan[dia].push({
             id: item.ejercicios?.id,
             nombre: item.ejercicios?.nombre,
             grupo_muscular: item.ejercicios?.grupo_muscular,
             icono: item.ejercicios?.icono,
-            // Leemos las series del JSONB 'plan_sets'
-            sets: Array.isArray(item.plan_sets) ? item.plan_sets : [{ reps: 10, weight: 0 }]
+            sets
           });
         });
         setWeeklyExercises(newWeeklyPlan);
@@ -65,7 +80,7 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
       setLoading(false);
     };
     fetchData();
-  }, [id]);
+  }, [id, prefsLoading, isImperial]); // Recargar si cambian las unidades
 
   const currentDayExercises = weeklyExercises[selectedDay] || [];
 
@@ -110,7 +125,15 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
       // Envolver para el servidor
       const payload: any = {};
       Object.keys(weeklyExercises).forEach(d => {
-        payload[d] = { ejercicios: weeklyExercises[d] };
+        // Mapear ejercicios y convertir pesos a KG para guardar
+        const exercisesForDay = weeklyExercises[d].map(ex => ({
+          ...ex,
+          sets: ex.sets.map((s: any) => ({
+            ...s,
+            weight: toKg(parseFloat(s.weight) || 0)
+          }))
+        }));
+        payload[d] = { ejercicios: exercisesForDay };
       });
 
       const result = await updateWeeklyPlan(id, nombrePlan, JSON.stringify(payload));
@@ -133,7 +156,7 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
     return 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-white';
   };
 
-  if (loading) return <div className="min-h-screen bg-background-light dark:bg-background-dark p-10 text-center text-gray-500">Cargando rutina...</div>;
+  if (!mounted || loading) return <div className="min-h-screen bg-background-light dark:bg-background-dark p-10 text-center text-gray-500">Cargando rutina...</div>;
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display min-h-screen flex flex-col overflow-hidden pb-20">
@@ -208,7 +231,7 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
                 <div className="grid grid-cols-12 gap-2 px-2 text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
                   <div className="col-span-2 text-center">SERIE</div>
                   <div className="col-span-4 text-center">REPS</div>
-                  <div className="col-span-4 text-center">KG</div>
+                  <div className="col-span-4 text-center">{isImperial ? 'LBS' : 'KG'}</div>
                   <div className="col-span-2"></div>
                 </div>
                 {ex.sets.map((set: any, sIdx: number) => (

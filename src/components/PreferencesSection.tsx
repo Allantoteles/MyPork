@@ -2,6 +2,7 @@
 
 import React, { useTransition, useState } from 'react'
 import { updateProfilePreference } from '@/app/settings/actions'
+import { usePreferences } from '@/hooks/usePreferences'
 
 interface PreferencesProps {
   initialUnits: string
@@ -11,9 +12,8 @@ interface PreferencesProps {
 export function PreferencesSection({ initialUnits, initialRest }: PreferencesProps) {
   const [isPending, startTransition] = useTransition()
   
-  // Estados para valores
-  const [units, setUnits] = useState(initialUnits)
-  const [rest, setRest] = useState(initialRest)
+  // Consumir contexto global
+  const { units, restSeconds, updatePreferences } = usePreferences()
 
   // Estado para saber qué menú está abierto
   const [openSection, setOpenSection] = useState<'units' | 'rest' | null>(null)
@@ -24,7 +24,10 @@ export function PreferencesSection({ initialUnits, initialRest }: PreferencesPro
 
   // Guardar Unidades
   const selectUnit = (val: string) => {
-    setUnits(val)
+    // 1. Actualización optimista global
+    updatePreferences(val, restSeconds)
+    
+    // 2. Persistencia en servidor
     startTransition(async () => {
       const formData = new FormData()
       formData.append('unidades', val)
@@ -35,7 +38,10 @@ export function PreferencesSection({ initialUnits, initialRest }: PreferencesPro
 
   // Guardar Descanso
   const selectRest = (val: number) => {
-    setRest(val)
+    // 1. Actualización optimista global
+    updatePreferences(units, val)
+
+    // 2. Persistencia en servidor
     startTransition(async () => {
       const formData = new FormData()
       formData.append('descanso', val.toString())
@@ -101,7 +107,7 @@ export function PreferencesSection({ initialUnits, initialRest }: PreferencesPro
               <span className="font-medium">Descanso Predeterminado</span>
             </div>
             <div className="flex items-center gap-2 text-text-secondary text-sm">
-              <span className={openSection === 'rest' ? 'text-primary font-bold' : ''}>{rest}s</span>
+              <span className={openSection === 'rest' ? 'text-primary font-bold' : ''}>{restSeconds}s</span>
               <span className={`material-symbols-outlined text-gray-600 transition-transform duration-300 ${openSection === 'rest' ? 'rotate-90' : ''}`}>
                 chevron_right
               </span>
@@ -120,7 +126,7 @@ export function PreferencesSection({ initialUnits, initialRest }: PreferencesPro
                     key={time}
                     onClick={() => selectRest(time)}
                     className={`shrink-0 px-4 py-2 rounded-lg text-xs font-bold transition-all border ${
-                      rest === time 
+                      restSeconds === time 
                         ? 'bg-primary text-background-dark border-primary' 
                         : 'bg-surface-dark border-white/10 text-text-secondary hover:border-white/30'
                     }`}
@@ -136,7 +142,7 @@ export function PreferencesSection({ initialUnits, initialRest }: PreferencesPro
                 <div className="relative w-20">
                     <input 
                         type="number" 
-                        value={rest}
+                        value={restSeconds}
                         onChange={(e) => selectRest(parseInt(e.target.value) || 0)}
                         className="w-full bg-surface-dark border border-white/10 rounded-lg px-2 py-1 text-sm text-center text-white focus:ring-1 focus:ring-primary focus:border-primary focus:outline-none"
                     />

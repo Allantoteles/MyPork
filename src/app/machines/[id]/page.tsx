@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { updateExercise, deleteExercise } from './actions'
 import { ConfirmModal } from '@/components/ConfirmModal';
+import { db } from '@/lib/db'
 
 export default function ExerciseDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -15,15 +16,29 @@ export default function ExerciseDetail({ params }: { params: Promise<{ id: strin
   const [ex, setEx] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const [isLocalOnly, setIsLocalOnly] = useState(false);
 
   React.useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
+      
+      // 1. Buscar en ejercicios locales pendientes
+      const localExercise = await db.ejerciciosPendientes.get(id as any);
+      if (localExercise && localExercise.sincronizado === 0) {
+        setEx(localExercise);
+        setIsOwner(true);
+        setIsLocalOnly(true);
+        setLoading(false);
+        return;
+      }
+      
+      // 2. Si no está localmente, buscar en Supabase
       const { data } = await supabase.from('ejercicios').select('*').eq('id', id).single();
       if (data) {
         setEx(data);
         setIsOwner(data.usuario_id === user?.id);
+        setIsLocalOnly(false);
       }
       setLoading(false);
     };
@@ -31,13 +46,17 @@ export default function ExerciseDetail({ params }: { params: Promise<{ id: strin
   }, [id]);
 
   const handleSave = async (formData: FormData) => {
+    formData.append('isLocalOnly', isLocalOnly.toString());
     startTransition(async () => {
       await updateExercise(id, formData);
     });
   };
 
   const handleDelete = async () => {
-    await deleteExercise(id);
+    const result = await deleteExercise(id, isLocalOnly);
+    if (result?.error) {
+      alert(result.error);
+    }
   };
 
   if (loading) return <div className="min-h-screen bg-background-light dark:bg-background-dark p-10 text-center">Cargando...</div>;
@@ -65,7 +84,7 @@ export default function ExerciseDetail({ params }: { params: Promise<{ id: strin
               disabled={isPending}
               className="text-base text-primary font-bold hover:text-primary/80 transition-colors disabled:opacity-50"
             >
-              {isPending ? '...' : 'Guardar'}
+              {isPending ? '...' : isLocalOnly ? 'Guardar (Local)' : 'Guardar'}
             </button>
           ) : <div className="w-12" />}
         </header>
@@ -75,6 +94,11 @@ export default function ExerciseDetail({ params }: { params: Promise<{ id: strin
           {!isOwner && (
             <div className="bg-blue-500/10 border border-blue-500/20 text-blue-500 p-3 rounded-xl text-sm text-center">
               Este es un ejercicio de la biblioteca global. No puedes editarlo.
+            </div>
+          )}
+          {isLocalOnly && (
+            <div className="bg-orange-500/10 border border-orange-500/20 text-orange-500 p-3 rounded-xl text-sm text-center">
+              Ejercicio local. Se sincronizará cuando conectes a internet.
             </div>
           )}
 

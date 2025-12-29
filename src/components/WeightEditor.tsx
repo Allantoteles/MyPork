@@ -1,22 +1,44 @@
 "use client"
 
-import React, { useTransition, useState, useEffect } from 'react'
+import React, { useTransition, useState, useEffect, useMemo } from 'react'
 import { updateProfilePreference } from '@/app/settings/actions'
 
 interface WeightEditorProps {
   initialWeight: number | null
+  units?: string
 }
 
-export function WeightEditor({ initialWeight }: WeightEditorProps) {
+const KG_TO_LB = 2.20462
+
+export function WeightEditor({ initialWeight, units = 'Métrico (kg)' }: WeightEditorProps) {
   const [isPending, startTransition] = useTransition()
-  const [weight, setWeight] = useState(initialWeight || '')
+  const [weightKg, setWeightKg] = useState<number | null>(initialWeight)
   const [isOpen, setIsOpen] = useState(false)
   
-  // Estado temporal para el valor mientras se edita en el modal
-  const [tempWeight, setTempWeight] = useState(initialWeight || '')
+  // Valor en unidades elegidas para mostrar/editar
+  const [tempWeight, setTempWeight] = useState<string>(initialWeight?.toString() || '')
+
+  const unitLabel = units.includes('lbs') ? 'lbs' : 'kg'
+
+  const toDisplay = useMemo(() => (kg: number | null) => {
+    if (kg === null || kg === undefined) return ''
+    const val = unitLabel === 'lbs' ? kg * KG_TO_LB : kg
+    return val.toFixed(1)
+  }, [unitLabel])
+
+  const toKg = (val: number) => {
+    if (Number.isNaN(val)) return null
+    const kgVal = unitLabel === 'lbs' ? val / KG_TO_LB : val
+    return parseFloat(kgVal.toFixed(3))
+  }
+
+  useEffect(() => {
+    setWeightKg(initialWeight)
+    setTempWeight(toDisplay(initialWeight ?? null))
+  }, [initialWeight, toDisplay])
 
   const openModal = () => {
-    setTempWeight(weight)
+    setTempWeight(toDisplay(weightKg))
     setIsOpen(true)
   }
 
@@ -26,11 +48,13 @@ export function WeightEditor({ initialWeight }: WeightEditorProps) {
 
   const handleSave = () => {
     const val = parseFloat(tempWeight.toString())
-    if (!isNaN(val)) {
-      setWeight(val)
+    const kgVal = toKg(val)
+    if (kgVal !== null) {
+      setWeightKg(kgVal)
+      setTempWeight(toDisplay(kgVal))
       startTransition(async () => {
         const formData = new FormData()
-        formData.append('peso', val.toString())
+        formData.append('peso', kgVal.toString())
         await updateProfilePreference(formData)
       })
     }
@@ -48,9 +72,9 @@ export function WeightEditor({ initialWeight }: WeightEditorProps) {
         
         <div className="flex items-baseline gap-0.5">
           <span className="text-xl font-bold text-primary group-hover:scale-105 transition-transform">
-            {weight || '--'}
+            {toDisplay(weightKg) || '--'}
           </span>
-          <span className="text-sm font-bold text-primary/60">kg</span>
+          <span className="text-sm font-bold text-primary/60">{unitLabel}</span>
         </div>
       </button>
 
@@ -95,7 +119,7 @@ export function WeightEditor({ initialWeight }: WeightEditorProps) {
                   className="bg-transparent text-5xl font-bold text-white text-center w-40 focus:outline-none appearance-none p-0 m-0 border-none placeholder-gray-600"
                   placeholder="0.0"
                 />
-                <span className="text-xl text-gray-400 font-medium absolute -right-8 bottom-2">kg</span>
+                <span className="text-xl text-gray-400 font-medium absolute -right-8 bottom-2">{unitLabel}</span>
               </div>
               <p className="text-xs text-gray-500 mt-2">Ingresa tu peso corporal actual</p>
             </div>

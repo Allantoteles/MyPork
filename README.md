@@ -34,3 +34,22 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment Setup
+
+To run locally, set your Supabase credentials:
+
+1. Create a `.env.local` file in the project root (copy from `.env.local.example`).
+2. Add these values from your Supabase dashboard (Settings → API):
+	- `NEXT_PUBLIC_SUPABASE_URL`
+	- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+Example:
+
+```bash
+cp .env.local.example .env.local
+# then edit .env.local with your project URL and anon key
+```
+
+For Cloudflare Workers deployment, `wrangler.jsonc` already defines:
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_SITE_URL` under `vars`.

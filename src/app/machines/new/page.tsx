@@ -1,18 +1,17 @@
 "use client"
 
-import React, { useTransition, useRef, useState, useEffect } from 'react'
+import React, { useTransition, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { db } from '@/lib/db'
 
 export default function NewExercise() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const fileInputRef = useRef<HTMLInputElement>(null)
   
   // Estados de formulario
   const [exerciseType, setExerciseType] = useState('Pesas')
   const [selectedGroup, setSelectedGroup] = useState('Pecho')
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [imageBase64, setImageBase64] = useState<string | null>(null)
 
   // Listas dinámicas
   const muscleGroups = ['Pecho', 'Espalda', 'Piernas', 'Brazos', 'Hombros', 'Abdominales', 'Full Body', 'Otro'];
@@ -23,10 +22,39 @@ export default function NewExercise() {
     setSelectedGroup(exerciseType === 'Pesas' ? 'Pecho' : 'Cinta')
   }, [exerciseType])
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setPreviewUrl(URL.createObjectURL(file))
+      // Leer la imagen original
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const img = new Image()
+        img.onload = () => {
+          // Crear canvas para comprimir
+          const canvas = document.createElement('canvas')
+          let width = img.width
+          let height = img.height
+
+          // Redimensionar si es muy grande (máximo 1200px de ancho)
+          const maxWidth = 1200
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width)
+            width = maxWidth
+          }
+
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height)
+            // Convertir a base64 con compresión (calidad 0.8)
+            const base64String = canvas.toDataURL('image/jpeg', 0.8)
+            setImageBase64(base64String)
+          }
+        }
+        img.src = event.target?.result as string
+      }
+      reader.readAsDataURL(file)
     }
   }
 
@@ -37,17 +65,17 @@ export default function NewExercise() {
     const nombre = formData.get('nombre') as string
     const descripcion = formData.get('descripcion') as string
     const esFavorito = formData.get('es_favorito') === 'on'
-    const fotoFile = fileInputRef.current?.files?.[0]
 
     startTransition(async () => {
       try {
+        // Guardar localmente en IndexedDB
         await db.ejerciciosPendientes.add({
           nombre,
           tipo: exerciseType,
           descripcion,
           es_favorito: esFavorito,
           grupo_muscular: selectedGroup,
-          foto_blob: fotoFile, 
+          foto_base64: imageBase64 || null,
           sincronizado: 0, 
           creado_at: new Date()
         })
@@ -160,27 +188,37 @@ export default function NewExercise() {
             </div>
           </div>
 
-          {/* Photo Section */}
-          <div>
-            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2 ml-1">Foto de referencia</label>
-            <div 
-              className="relative w-full h-48 rounded-2xl border-2 border-dashed border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors flex flex-col items-center justify-center gap-3 overflow-hidden group cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {previewUrl ? (
-                <img src={previewUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+          {/* Imagen de referencia */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 ml-1">Foto de referencia (opcional)</label>
+            <div className="bg-white dark:bg-white/5 rounded-xl p-4 border border-gray-100 dark:border-white/5">
+              {imageBase64 ? (
+                <div className="relative">
+                  <img src={imageBase64} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                  <button
+                    type="button"
+                    onClick={() => setImageBase64(null)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">close</span>
+                  </button>
+                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                    {(imageBase64.length / 1024).toFixed(1)} KB
+                  </div>
+                </div>
               ) : (
-                <>
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <span className="material-symbols-outlined text-primary text-2xl">add_a_photo</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="text-sm font-medium text-primary block">Adjuntar Foto</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">Se guardará en local primero</span>
-                  </div>
-                </>
+                <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 dark:border-white/10 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                  <span className="material-symbols-outlined text-gray-400 text-[32px]">add_photo_alternate</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mt-2">Toca para seleccionar imagen</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
               )}
-              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">La imagen se guarda como texto en la base de datos</p>
             </div>
           </div>
 
