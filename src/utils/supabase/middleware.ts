@@ -49,37 +49,18 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // 2. Si hay usuario, verificar estado del perfil
+  // 2. Si hay usuario, redirigir desde auth routes
   if (user) {
-    // Si ya está logueado e intenta ir a login, al home (o onboarding)
+    // Si ya está logueado e intenta ir a login, al home
     if (isAuthRoute) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
       return NextResponse.redirect(url)
     }
 
-    // Verificar si el perfil está completo
-    const { data: perfil } = await supabase
-      .from('perfiles')
-      .select('altura_cm')
-      .eq('id', user.id)
-      .single()
-
-    const profileIncomplete = !perfil || !perfil.altura_cm
-
-    // BLOQUEO: Si el perfil está incompleto y NO está en onboarding, redirigir a onboarding
-    if (profileIncomplete && !isOnboardingRoute) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/onboarding'
-      return NextResponse.redirect(url)
-    }
-
-    // Si el perfil está completo e intenta volver a onboarding, al home
-    if (!profileIncomplete && isOnboardingRoute) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/'
-      return NextResponse.redirect(url)
-    }
+    // Nota: La verificación del perfil se hace en el servidor,
+    // no en el middleware para evitar timeouts en edge (Cloudflare)
+    // Ver: src/app/layout.tsx
   }
 
   return supabaseResponse
