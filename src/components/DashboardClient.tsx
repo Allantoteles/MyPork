@@ -200,6 +200,15 @@ export function DashboardClient({ user, perfil, sesiones }: DashboardClientProps
               <p className="text-[10px] text-slate-500 dark:text-text-secondary">Personalizada</p>
             </div>
           </Link>
+          <Link href="/explore" className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-left shadow-sm">
+            <div className="size-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 shrink-0">
+              <span className="material-symbols-outlined">explore</span>
+            </div>
+            <div>
+              <p className="font-bold text-sm text-slate-900 dark:text-white">Explorar</p>
+              <p className="text-[10px] text-slate-500 dark:text-text-secondary">Base de datos</p>
+            </div>
+          </Link>
           <Link href="/history" className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-left shadow-sm">
             <div className="size-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 shrink-0">
               <span className="material-symbols-outlined">history</span>

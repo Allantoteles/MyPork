@@ -67,7 +67,7 @@ const Navigation: React.FC = () => {
 
                 <button 
                   onClick={() => handleNavigation('/machines/new')}
-                  className="flex items-center gap-4 px-4 py-4 w-full text-left active:bg-slate-100 dark:active:bg-white/5 transition-colors"
+                  className="flex items-center gap-4 px-4 py-4 w-full text-left active:bg-slate-100 dark:active:bg-white/5 transition-colors border-b border-gray-100 dark:border-white/5"
                 >
                   <div className="size-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500">
                     <span className="material-symbols-outlined">add</span>
@@ -75,6 +75,19 @@ const Navigation: React.FC = () => {
                   <div className="flex flex-col">
                     <span className="text-base font-bold text-slate-900 dark:text-white">Nuevo Ejercicio</span>
                     <span className="text-xs text-slate-500 dark:text-text-secondary/60">Añadir a la biblioteca</span>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => handleNavigation('/explore')}
+                  className="flex items-center gap-4 px-4 py-4 w-full text-left active:bg-slate-100 dark:active:bg-white/5 transition-colors"
+                >
+                  <div className="size-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                    <span className="material-symbols-outlined">explore</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-base font-bold text-slate-900 dark:text-white">Explorar Wger</span>
+                    <span className="text-xs text-slate-500 dark:text-text-secondary/60">Buscar en base de datos externa</span>
                   </div>
                 </button>
               </div>

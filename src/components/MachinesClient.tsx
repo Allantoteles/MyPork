@@ -33,7 +33,8 @@ function LibraryContent() {
   const { data: rutinas, loading: loadingRut, isFromCache: cacheRut } = useCacheFirst<Rutina>(
     'rutinas',
     'rutinasCache',
-    user?.id
+    user?.id,
+    { forceRefresh: !user } // Cargar solo cuando tengamos usuario
   );
 
   const loading = loadingEx || loadingRut;

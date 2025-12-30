@@ -29,7 +29,8 @@ export async function saveWeeklyPlan(nombrePlan: string, planJson: string) {
     // B. Preparar ejercicios
     const todosLosEjercicios: any[] = []
 
-    for (const [dia, ejercicios] of Object.entries(plan) as any) {
+    for (const [dia, data] of Object.entries(plan) as any) {
+      const ejercicios = data.ejercicios || data;
       if (!Array.isArray(ejercicios) || ejercicios.length === 0) continue;
 
       ejercicios.forEach((ex: any, index: number) => {

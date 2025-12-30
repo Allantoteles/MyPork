@@ -20,6 +20,7 @@ export function Sidebar({ isOpen, onClose, user }: SidebarProps) {
   const menuItems = [
     { name: 'Inicio', icon: 'home', path: '/' },
     { name: 'Biblioteca', icon: 'library_books', path: '/machines' },
+    { name: 'Explorar', icon: 'explore', path: '/explore' },
     { name: 'Historial', icon: 'history', path: '/history' },
     { name: 'Aprendizaje', icon: 'auto_stories', path: '/learning', highlight: true },
     { name: 'Configuraciones', icon: 'settings', path: '/settings' },

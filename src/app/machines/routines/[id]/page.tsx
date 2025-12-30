@@ -35,7 +35,7 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
   }, []);
 
   useEffect(() => {
-    if (!mounted || prefsLoading) return;
+    if (!mounted) return;
 
     const fetchData = async () => {
       const supabase = createClient();
@@ -63,7 +63,7 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
           const sets = Array.isArray(item.plan_sets) 
             ? item.plan_sets.map((s: any) => ({
                 ...s,
-                weight: toDisplayWeight(parseFloat(s.weight) || 0)
+                weight: isImperial ? (parseFloat(s.weight) || 0) * 2.20462 : parseFloat(s.weight) || 0
               }))
             : [{ reps: 10, weight: 0 }];
 
@@ -80,7 +80,7 @@ export default function EditRoutine({ params }: { params: Promise<{ id: string }
       setLoading(false);
     };
     fetchData();
-  }, [id, prefsLoading, isImperial]); // Recargar si cambian las unidades
+  }, [id, mounted, isImperial]);
 
   const currentDayExercises = weeklyExercises[selectedDay] || [];
 
